@@ -5,6 +5,7 @@ from openpyxl import load_workbook      # <- imports
 from openpyxl.styles import PatternFill
 from PIL import Image
 import csv
+import os
 
 
 times = 0
@@ -17,8 +18,24 @@ while times < 10:
   except Exception as e:
     print(F"REAL ERROR {e}\n\nDev note: the file path may be incorrect, the file extension may be wrong, the file may not exist")
 
+
+debug = input("Write Debug file? Y/N").upper()
+AutoOpen = input("Automatically open excel when the processing is over? Y/N").upper()
+
+
+if debug == "Y":
+  debug = True
+else:
+  debug = False
+
+if AutoOpen == "Y":
+  AutoOpen = True
+else:
+  AutoOpen = False
+
+
 def Write_File(A1,A2,A3):
-  with open("Test.txt","w")as file:
+  with open("DEBUG.txt","w")as file:
 
     file.write("\n\nFIRST ARRAY \n"+ str(A1))
     file.write("\n\nSECOND ARRAY \n"+ str(A2))
@@ -53,14 +70,13 @@ def Den2HexCol(R=False,G=False,B=False, value=0):      #<- takes RGB values in d
       
     return string
   
-
-
 print("Processing...")
 
 FILENAME = 'Image_data.xlsx' #Excel file to be written and read
 
-
 image = Image.open(f'{Image_name}') # <- the Image in question being loaded with PIL
+image = image.rotate(90, Image.NEAREST, expand = 1) 
+
 pixels = image.load() #<- Loading the pixels into a data structure (2D array), 1st element = pixel, 2nd element = pixel information
 
 workbook = xlsxwriter.Workbook(f'{FILENAME}') # Opening the excel workbook in xlsxwriter
@@ -116,8 +132,6 @@ wb = load_workbook(filename = f'{FILENAME}')
 ws = wb.active
 sheet = wb['Sheet1']
 
-
-
 for i in range(len(End_Array1)-1):
   #print(sheet[End_Array2[i]].value)
   conv = Den2HexCol(True,False,False,sheet[End_Array1[i]].value)
@@ -127,35 +141,25 @@ for i in range(len(End_Array1)-1):
   except Exception as e:
     print(f"ERROR CONV IS: {conv}")
 
-
-
 for i in range(len(End_Array2)-1):
-  #print(sheet[End_Array2[i]].value)
   conv = Den2HexCol(False,True,False,sheet[End_Array2[i]].value)
-  #print(conv)
   try:
     sheet[End_Array2[i]].fill = PatternFill(start_color=conv,fill_type = "solid")
   except Exception as e:
     print(f"ERROR CONV IS: {conv}")
 
-
 for i in range(len(End_Array3)-1):
-  #print(sheet[End_Array2[i]].value)
   conv = Den2HexCol(False,False,True,sheet[End_Array2[i]].value)
-  #print(conv)
   try:
     sheet[End_Array3[i]].fill = PatternFill(start_color=conv,fill_type = "solid")
   except Exception as e:
     print(f"ERROR CONV IS: {conv}")
 
-
-
-
-
-
-
+if debug:
+  Write_File(End_Array1,End_Array2,End_Array3)
 
 wb.save(f'{FILENAME}')
 
-
+if AutoOpen:
+  os.system(f"start {FILENAME}")
 

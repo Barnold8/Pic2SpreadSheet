@@ -5,7 +5,9 @@ This little python program will turn your image files into a spreadsheet that re
 # Requirements
 
 > [Python](https://www.python.org)
+
 > [xlsxwriter](https://pypi.org/project/XlsxWriter/)
+
 > [openpyxl](https://pypi.org/project/openpyxl/)
 
 
